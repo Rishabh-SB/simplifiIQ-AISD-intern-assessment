@@ -5,6 +5,8 @@
 https://github.com/user-attachments/assets/9d8a5aff-b759-4f22-b688-d2b5d9ed487e
 
 
+Tracking google sheet: https://docs.google.com/spreadsheets/d/1wuZ-yS-neJaXnYnPQge4iL8msHrEfZ0dzlCeTnV322w
+Tracking google drive folder: https://drive.google.com/drive/folders/1_lec1BYoj8bYcruVCII8jSC9MtQraHlb
 
 This repository contains a production-ready, fully automated end-to-end lead ingestion and enrichment system built in response to the SimplifIQ AI Software Developer Intern Assessment.
 
