@@ -1,5 +1,11 @@
 # SimplifIQ Intel Engine: Automated Lead Enrichment Pipeline
 
+
+
+https://github.com/user-attachments/assets/9d8a5aff-b759-4f22-b688-d2b5d9ed487e
+
+
+
 This repository contains a production-ready, fully automated end-to-end lead ingestion and enrichment system built in response to the SimplifIQ AI Software Developer Intern Assessment.
 
 When a prospect submits a lead intake form containing their company details, the system seamlessly takes over without any human intervention:
