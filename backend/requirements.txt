@@ -1,0 +1,11 @@
+fastapi
+uvicorn
+pydantic
+email-validator
+python-dotenv
+google-genai
+httpx
+beautifulsoup4
+reportlab
+resend
+google-api-python-client
