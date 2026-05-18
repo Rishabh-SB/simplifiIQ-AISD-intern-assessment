@@ -1,6 +1,7 @@
 import os
 import json
 import base64
+import time  # Imported for backoff delays
 from datetime import datetime
 import resend
 from google.oauth2.credentials import Credentials
@@ -85,19 +86,44 @@ def log_to_google_sheet(name: str, email: str, company: str, status: str):
 def send_outreach_email(recipient_email: str, company_name: str, pdf_path: str):
     resend_key = os.getenv("RESEND_API_KEY")
     from_email = os.getenv("FROM_EMAIL", "onboarding@resend.dev")
-    if not resend_key: return
+    if not resend_key: 
+        print("❌ Resend API Key missing. Skipping email transmission.")
+        return
+        
+    resend.api_key = resend_key
+    
     try:
-        resend.api_key = resend_key
         with open(pdf_path, "rb") as pdf_file:
             encoded_pdf = base64.b64encode(pdf_file.read()).decode("utf-8")
-        params = {
-            "from": f"SimplifIQ Intelligence Team <{from_email}>",
-            "to": [recipient_email],
-            "subject": f"Your Custom AI Automation Audit — {company_name}",
-            "html": f"<h3>Hello,</h3><p>Thank you for requesting an engineering assessment review for <strong>{company_name}</strong>.</p><p>Please find your custom automation advisory report attached below.</p><br/><p>Best regards,<br/><strong>SimplifIQ Team</strong></p>",
-            "attachments": [{"content": encoded_pdf, "filename": os.path.basename(pdf_path)}]
-        }
-        resend.Emails.send(params)
-        print("✅ Email notification successfully sent through Resend!")
     except Exception as e:
-        print(f"❌ Failed transmitting email via Resend API: {e}")
+        print(f"❌ Failed to read or encode PDF asset: {e}")
+        return
+
+    params = {
+        "from": f"SimplifIQ Intelligence Team <{from_email}>",
+        "to": [recipient_email],
+        "subject": f"Your Custom AI Automation Audit — {company_name}",
+        "html": f"<h3>Hello,</h3><p>Thank you for requesting an engineering assessment review for <strong>{company_name}</strong>.</p><p>Please find your custom automation advisory report attached below.</p><br/><p>Best regards,<br/><strong>SimplifIQ Team</strong></p>",
+        "attachments": [{"content": encoded_pdf, "filename": os.path.basename(pdf_path)}],
+    }
+
+    # Resiliency Loop: Exponential Backoff Retry Strategy
+    max_retries = 3
+    delay = 2  # Starting delay in seconds
+    
+    for attempt in range(1, max_retries + 1):
+        try:
+            print(f"📧 Sending email via Resend (Attempt {attempt}/{max_retries})...")
+            resend.Emails.send(params)
+            print("✅ Email successfully transmitted through Resend infrastructure!")
+            return  # Success! Break out of the function entirely.
+            
+        except Exception as e:
+            print(f"⚠️ Attempt {attempt} failed transmitting email: {e}")
+            if attempt == max_retries:
+                print("❌ Maximum email transmission retries exceeded. Escalating error block.")
+                raise e  # Re-raise error to let main.py handle the pipeline status update
+            
+            print(f"🔄 Temporary network or DNS anomaly detected. Retrying in {delay} seconds...")
+            time.sleep(delay)
+            delay *= 2  # Double the wait time for the next try (2s -> 4s)
