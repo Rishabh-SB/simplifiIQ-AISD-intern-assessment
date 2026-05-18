@@ -1,6 +1,6 @@
-# SimplifiIQ (MOCK) Lead Engine and AI Automation Assessment Pipeline
+# SimplifiiQ (MOCK) Lead Engine and AI Automation Assessment Pipeline
 
-An enterprise-grade asynchronous lead generation and AI automation assessment pipeline. The system inputs user metadata via a modern, responsive frontend card interface, validates payload integrity via strict structural data layers, and kicks off isolated background worker tasks to process metrics, generate dynamic assessment reports, and dispatch custom client outreach material.
+An enterprise-grade asynchronous lead generation and AI automation assessment pipeline built for SimplifiiQ (MOCK). The system inputs user metadata via a corporate frontend interface, validates payload integrity via strict structural data layers, and kicks off isolated background worker tasks to process metrics, generate dynamic assessment reports, and dispatch custom client outreach material.
 
 ---
 
@@ -8,7 +8,7 @@ An enterprise-grade asynchronous lead generation and AI automation assessment pi
 
 The project is structured as a decoupled monorepo containing distinct, self-contained runtimes:
 
-- `/frontend`: Built with Next.js 14 (App Router), TypeScript, and Tailwind CSS, featuring a fluid cyberpunk layout that stretches to edge display viewports natively.
+- `/frontend`: Built with Next.js 14 (App Router), TypeScript, and Tailwind CSS, styled to mirror the SimplifiiQ (MOCK) color framework.
 - `/backend`: Engineered with FastAPI (Python), utilizing Pydantic validation barriers, exponential backoff resiliency loops for network operations, and multi-threaded background queues for heavy integrations.
 
 ---

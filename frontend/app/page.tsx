@@ -1,183 +1,189 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
+import {
+  Sparkles,
+  ArrowRight,
+  Building2,
+  Mail,
+  User,
+  Globe,
+  CheckCircle,
+  AlertCircle,
+} from "lucide-react";
 
-interface FormFields {
-  [key: string]: string;
-  name: string;
-  email: string;
-  company: string;
-}
-
-export default function Home() {
-  const [formData, setFormData] = useState<FormFields>({
+export default function LeadFormPage() {
+  const [formData, setFormData] = useState({
     name: "",
     email: "",
-    company: "",
+    company_name: "",
+    company_url: "",
   });
-  const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState<{
-    type: "success" | "error";
+    type: "idle" | "loading" | "success" | "error";
     message: string;
-  } | null>(null);
+  }>({ type: "idle", message: "" });
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    setStatus(null);
-
-    // Hard client-side baseline verification check (No whitespace-only submittals)
-    if (
-      !formData.name.trim() ||
-      !formData.email.trim() ||
-      !formData.company.trim()
-    ) {
-      setStatus({
-        type: "error",
-        message: "Please fill out all fields before submitting.",
-      });
-      setLoading(false);
-      return;
-    }
+    setStatus({
+      type: "loading",
+      message: "Connecting to automation pipeline...",
+    });
+    const backendUrl =
+      process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000";
 
     try {
-      const res = await fetch("http://localhost:8000/api/leads", {
+      const response = await fetch(`${backendUrl}/api/leads`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
+      const data = await response.json();
 
-      const data = await res.json();
-
-      if (res.ok) {
+      if (response.ok) {
         setStatus({
           type: "success",
           message:
-            "Audit sequence initialized! Please check your inbox shortly for a copy of your report.",
+            "Lead Captured! Your custom audit PDF is being generated in the background. Check your inbox shortly.",
         });
-        setFormData({ name: "", email: "", company: "" });
+        setFormData({ name: "", email: "", company_name: "", company_url: "" });
       } else {
-        // Checks if backend returned structural Pydantic array details vs custom detail messages
-        const errorMsg = Array.isArray(data.detail)
-          ? `Validation error: ${data.detail[0].msg}`
-          : data.detail ||
-            "The processing server rejected this request format.";
-        setStatus({ type: "error", message: errorMsg });
+        setStatus({
+          type: "error",
+          message: data.detail || "Server validation error.",
+        });
       }
-    } catch {
-      // Handles hard offline drop error states where fetch cannot even ping the port gateway
+    } catch (err) {
       setStatus({
         type: "error",
         message:
-          "Network Timeout: Unable to connect to the backend orchestration server. Please verify it is running on port 8000.",
+          "Failed to contact backend API. Is your Uvicorn server running on port 8000?",
       });
-    } finally {
-      setLoading(false);
     }
   };
 
   return (
-    <main className="w-screen min-h-screen bg-slate-950 flex flex-col items-center justify-center p-4 relative overflow-x-hidden">
-      <div className="absolute inset-0 w-full h-full bg-[linear-gradient(to_right,#0f172a_1px,transparent_1px),linear-gradient(to_bottom,#0f172a_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_50%,#000_70%,transparent_100%)]" />
-
-      <div className="w-full max-w-md bg-slate-900/80 border border-slate-800/80 backdrop-blur-md rounded-2xl p-8 shadow-2xl relative z-10 hover:border-slate-700/60 transition-all duration-300">
-        <div className="mb-8 text-center">
-          <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 mb-3 font-bold text-xl">
-            SΩ
-          </div>
-          <h1 className="text-2xl font-bold text-white tracking-tight">
-            SimplifIQ Lead Engine
-          </h1>
-          <p className="text-slate-400 text-sm mt-1">
-            Initialize AI Automation Assessments instantly.
-          </p>
+    <div className="w-full max-w-xl bg-slate-800/60 backdrop-blur-md border border-slate-700/50 rounded-2xl shadow-2xl p-6 md:p-10">
+      <div className="text-center mb-8">
+        <div className="inline-flex items-center justify-center bg-blue-600/10 text-blue-400 border border-blue-500/20 rounded-xl px-3 py-1 text-xs font-semibold uppercase gap-1.5 mb-3">
+          <Sparkles className="w-3.5 h-3.5" /> Pipeline Active
         </div>
+        <h1 className="text-3xl font-extrabold tracking-tight text-white">
+          SimplifIQ Intel Engine
+        </h1>
+        <p className="text-sm text-slate-400 mt-2">
+          Submit details below to generate a tailored automation audit report
+          PDF directly to your email.
+        </p>
+      </div>
 
-        {status && (
-          <div
-            className={`mb-6 p-4 rounded-xl text-sm border font-medium transition-all duration-200 ${
-              status.type === "success"
-                ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
-                : "bg-rose-500/10 border-rose-500/20 text-rose-400"
-            }`}
-          >
-            {status.message}
+      <form onSubmit={handleSubmit} className="space-y-5">
+        <div>
+          <label className="block text-xs font-bold uppercase text-slate-400 mb-2">
+            Full Name
+          </label>
+          <div className="relative">
+            <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+            <input
+              type="text"
+              name="name"
+              required
+              value={formData.name}
+              onChange={handleChange}
+              placeholder="Alex Chen"
+              className="w-full bg-slate-900/50 border border-slate-700 focus:border-blue-500 rounded-xl py-3 pl-11 pr-4 text-sm text-white outline-none"
+            />
           </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-5">
-          {[
-            {
-              id: "name",
-              label: "Full Name",
-              type: "text",
-              placeholder: "John Doe",
-            },
-            {
-              id: "email",
-              label: "Email Address",
-              type: "email",
-              placeholder: "john@company.com",
-            },
-            {
-              id: "company",
-              label: "Company Name",
-              type: "text",
-              placeholder: "Acme Corp",
-            },
-          ].map((field) => (
-            <div key={field.id}>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">
-                {field.label}
-              </label>
+        </div>
+        <div>
+          <label className="block text-xs font-bold uppercase text-slate-400 mb-2">
+            Email Address
+          </label>
+          <div className="relative">
+            <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+            <input
+              type="email"
+              name="email"
+              required
+              value={formData.email}
+              onChange={handleChange}
+              placeholder="alex@company.com"
+              className="w-full bg-slate-900/50 border border-slate-700 focus:border-blue-500 rounded-xl py-3 pl-11 pr-4 text-sm text-white outline-none"
+            />
+          </div>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-xs font-bold uppercase text-slate-400 mb-2">
+              Company Name
+            </label>
+            <div className="relative">
+              <Building2 className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
               <input
-                type={field.type}
+                type="text"
+                name="company_name"
                 required
-                disabled={loading}
-                value={formData[field.id]}
-                onChange={(e) =>
-                  setFormData({ ...formData, [field.id]: e.target.value })
-                }
-                placeholder={field.placeholder}
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white placeholder-slate-600 font-medium text-sm transition-all outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 disabled:opacity-50"
+                value={formData.company_name}
+                onChange={handleChange}
+                placeholder="SimplifIQ"
+                className="w-full bg-slate-900/50 border border-slate-700 focus:border-blue-500 rounded-xl py-3 pl-11 pr-4 text-sm text-white outline-none"
               />
             </div>
-          ))}
+          </div>
+          <div>
+            <label className="block text-xs font-bold uppercase text-slate-400 mb-2">
+              Company Website
+            </label>
+            <div className="relative">
+              <Globe className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+              <input
+                type="text"
+                name="company_url"
+                required
+                value={formData.company_url}
+                onChange={handleChange}
+                placeholder="simplifiq.ai"
+                className="w-full bg-slate-900/50 border border-slate-700 focus:border-blue-500 rounded-xl py-3 pl-11 pr-4 text-sm text-white outline-none"
+              />
+            </div>
+          </div>
+        </div>
+        <button
+          type="submit"
+          disabled={status.type === "loading"}
+          className="w-full mt-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 text-white font-semibold rounded-xl py-3.5 px-4 text-sm flex items-center justify-center gap-2 disabled:opacity-50"
+        >
+          {status.type === "loading" ? (
+            <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+          ) : (
+            <>
+              Generate Audit Report <ArrowRight className="w-4 h-4" />
+            </>
+          )}
+        </button>
+      </form>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full mt-2 bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white font-semibold text-sm py-3.5 rounded-xl shadow-lg shadow-indigo-600/10 transition-all outline-none focus:ring-2 focus:ring-indigo-500/40 disabled:opacity-50 flex items-center justify-center space-x-2"
-          >
-            {loading ? (
-              <>
-                <svg
-                  className="animate-spin h-4 w-4 text-white"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  />
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  />
-                </svg>
-                <span>Processing Audit Pipeline...</span>
-              </>
-            ) : (
-              <span>Generate Audit Assessment</span>
-            )}
-          </button>
-        </form>
-      </div>
-    </main>
+      {status.type !== "idle" && status.type !== "loading" && (
+        <div
+          className={`mt-6 p-4 rounded-xl border flex items-start gap-3 text-sm ${
+            status.type === "success"
+              ? "bg-emerald-950/30 border-emerald-500/20 text-emerald-400"
+              : "bg-rose-950/30 border-rose-500/20 text-rose-400"
+          }`}
+        >
+          {status.type === "success" ? (
+            <CheckCircle className="w-5 h-5 shrink-0 mt-0.5" />
+          ) : (
+            <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
+          )}
+          <div>{status.message}</div>
+        </div>
+      )}
+    </div>
   );
 }

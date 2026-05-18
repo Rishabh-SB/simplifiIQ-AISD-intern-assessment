@@ -1,8 +1,8 @@
-import "./globals.css";
 import type { Metadata } from "next";
+import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "SimplifIQ (mock) | Lead Audit Engine",
+  title: "SimplifIQ | Lead Audit Engine",
   description: "Automated Lead Enrichment Pipeline",
 };
 

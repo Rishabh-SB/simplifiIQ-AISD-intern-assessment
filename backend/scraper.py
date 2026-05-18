@@ -59,7 +59,7 @@ async def enrich_company_data(company_name: str, company_url: str) -> dict:
         )
         return parse_gemini_response(response.text)
     except Exception as e:
-        print(f"Gemini enrichment failure: {e}")
+        print(f"❌ Gemini enrichment failure: {e}")
         return {
             "industry": "General Corporate Domain",
             "summary": f"Active operational enterprise tracing to {company_name}.",
