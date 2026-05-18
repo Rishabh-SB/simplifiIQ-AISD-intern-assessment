@@ -36,7 +36,7 @@ export default function LeadFormPage() {
     });
     const backendUrl =
       process.env.NEXT_PUBLIC_BACKEND_URL ||
-      "https://sbrishabh.pythonanywhere.com";
+      "https://rishabhsb-simplifiiq-intern-assessment.hf.space";
 
     try {
       const response = await fetch(`${backendUrl}/api/leads`, {
