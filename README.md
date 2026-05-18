@@ -1,4 +1,4 @@
-# SimplifIQ (MOCK) Lead Engine and AI Automation Assessment Pipeline
+# SimplifiIQ (MOCK) Lead Engine and AI Automation Assessment Pipeline
 
 An enterprise-grade asynchronous lead generation and AI automation assessment pipeline. The system inputs user metadata via a modern, responsive frontend card interface, validates payload integrity via strict structural data layers, and kicks off isolated background worker tasks to process metrics, generate dynamic assessment reports, and dispatch custom client outreach material.
 
