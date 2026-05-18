@@ -1,4 +1,3 @@
-````markdown
 # SimplifIQ Intel Engine: Automated Lead Enrichment Pipeline
 
 This repository contains a production-ready, fully automated end-to-end lead ingestion and enrichment system built in response to the SimplifIQ AI Software Developer Intern Assessment.
@@ -30,8 +29,8 @@ The project is structured as a completely decoupled monorepository housing two s
     ├── reporter.py       # ReportLab PDF design and generation script
     ├── integrations.py   # Google Drive, Sheets, and Resend API conduits
     └── requirements.txt  # Python dependency list
+
 ```
-````
 
 ---
 
@@ -183,7 +182,3 @@ _Open your browser and navigate to http://localhost:3000 to interact with the sy
 - Scraping Protection Barriers: If a target domain blocks standard HTTP requests or times out, the scraping module safely logs a warning and yields a structured layout to Gemini, which infers core business models from known domain structures.
 - Automated Session Handshakes: Google API authentication credentials utilize automatic underlying token transport refresh handlers to eliminate session expiration bugs midway through high-volume data loops.
 - Disk Cleanliness: The pipeline enforces a strict execution sequence that cleans up files locally right after processing, ensuring no orphaned PDFs take up server space.
-
-```
-
-```
